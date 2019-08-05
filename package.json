@@ -1,0 +1,36 @@
+{
+  "name": "@starbase/cryptic",
+  "version": "0.0.1",
+  "description": "Starbase Cryptography",
+  "main": "index.js",
+  "browser": "cryptic.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starbasealpha/cryptic.git"
+  },
+  "keywords": [
+    "crypto",
+    "cryptography",
+    "starbase",
+    "webcrypto",
+    "encrypt",
+    "decrypt",
+    "ecdh",
+    "ecdsa",
+    "hmac",
+    "pbkdf2",
+    "hkdf",
+    "encoding",
+    "hex",
+    "base64url"
+  ],
+  "author": "Mike Fuller",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/starbasealpha/cryptic/issues"
+  },
+  "homepage": "https://github.com/starbasealpha/cryptic#readme"
+}
