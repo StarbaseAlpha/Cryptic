@@ -27,6 +27,9 @@
     "hex",
     "base64url"
   ],
+  "dependencies": {
+    "node-webcrypto-ossl": "^1.0.39"
+  },
   "author": "Mike Fuller",
   "license": "MIT",
   "bugs": {
