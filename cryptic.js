@@ -72,7 +72,7 @@ function Cryptic(webCrypto) {
       "name": "ECDH",
       "namedCurve": curve
     }, true, ['deriveBits']);
-    let pub = await crypto.subtle.exportKey('raw', DH.publicKey);
+    let pub = await crypto.subtle.exportKey('spki', DH.publicKey);
     let key = encode(await crypto.subtle.exportKey('pkcs8', DH.privateKey));
     return {
       "pub": encode(pub),
@@ -85,7 +85,7 @@ function Cryptic(webCrypto) {
       "name": "ECDSA",
       "namedCurve": curve
     }, true, ['sign', 'verify']);
-    let pub = await crypto.subtle.exportKey('raw', user.publicKey);
+    let pub = await crypto.subtle.exportKey('spki', user.publicKey);
     let key = encode(await crypto.subtle.exportKey('pkcs8', user.privateKey));
     return {
       "pub": encode(pub),
@@ -108,7 +108,7 @@ function Cryptic(webCrypto) {
 
   const ecdsaVerify = cryptic.ecdsaVerify = cryptic.verify = async (pub, sig, msg, curve = "P-256", hashAlg = "SHA-256") => {
     let message = msg.toString();
-    let verifyKey = await crypto.subtle.importKey('raw', decode(pub), {
+    let verifyKey = await crypto.subtle.importKey('spki', decode(pub), {
       "name": "ECDSA",
       "namedCurve": curve
     }, false, ['verify']);
@@ -202,7 +202,7 @@ function Cryptic(webCrypto) {
 
   const ecdh = cryptic.ecdh = async (key, pub, curve = "P-256", size = 256) => {
 
-    let pubKey = await crypto.subtle.importKey('raw', decode(pub), {
+    let pubKey = await crypto.subtle.importKey('spki', decode(pub), {
       "name": "ECDH",
       "namedCurve": curve
     }, true, []);
