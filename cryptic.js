@@ -1,12 +1,19 @@
 'use strict';
 
-function Cryptic(webCrypto) {
+function Cryptic(webCrypto, encoder, decoder) {
 
   let cryptic = {};
 
   let crypto = webCrypto;
   if (typeof window !== 'undefined') {
     crypto = window.crypto || webCrypto;
+  }
+
+  let TextEncoder = encoder;
+  let TextDecoder = decoder;
+  if (typeof window !== 'undefined') {
+    TextEncoder = window.TextEncoder;
+    TextDecoder = window.TextDecoder;
   }
 
   const toHex = cryptic.toHex = (byteArray) => {
@@ -35,15 +42,11 @@ function Cryptic(webCrypto) {
   };
 
   const fromText = cryptic.fromText = (string) => {
-    return new Uint8Array(string.split('').map(val => {
-      return val.charCodeAt(0);
-    }));
+    return new TextEncoder().encode(string);
   };
 
   const toText = cryptic.toText = (byteArray) => {
-    return Array.from(new Uint8Array(byteArray)).map(val => {
-      return String.fromCharCode(val);
-    }).join('');
+    return new TextDecoder().decode(byteArray);
   };
 
   const combine = cryptic.combine = (bitsA = [], bitsB = []) => {
