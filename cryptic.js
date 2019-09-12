@@ -201,7 +201,13 @@ function Cryptic(webCrypto, encoder, decoder) {
       result = combine(result, T);
     }
     return await encode(result.slice(0, len / 8));
-  }
+  };
+
+  const kdf = cryptic.kdf = async (bits, salt, info, size, hashAlh="SHA-256") => {
+    let key = await cryptic.hmacSign(bits, cryptic.toText(info));
+    let hash = await cryptic.pbkdf2(cryptic.decode(key), salt, 1, size);
+    return hash;
+  };
 
   const ecdh = cryptic.ecdh = async (key, pub, curve = "P-256", size = 256) => {
 

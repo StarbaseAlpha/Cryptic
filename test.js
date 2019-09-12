@@ -32,8 +32,8 @@ async function Test(params={}) {
     alice.sharedKey = await cryptic.ecdh(alice.spk.key, bob.card.spk);
     bob.sharedKey = await cryptic.ecdh(bob.spk.key, alice.card.spk);
 
-    alice.hashKey = await cryptic.hkdf(cryptic.decode(alice.sharedKey), new Uint8Array([0]), cryptic.fromText("Hash"), 256, "SHA-256");
-    bob.hashKey = await cryptic.hkdf(cryptic.decode(bob.sharedKey), new Uint8Array([0]), cryptic.fromText("Hash"), 256, "SHA-256");
+    alice.hashKey = await cryptic.kdf(cryptic.decode(alice.sharedKey), new Uint8Array([0]), cryptic.fromText("Hash"), 256, "SHA-256");
+    bob.hashKey = await cryptic.kdf(cryptic.decode(bob.sharedKey), new Uint8Array([0]), cryptic.fromText("Hash"), 256, "SHA-256");
 
     alice.encrypted = await cryptic.encrypt("Hello Bob!", cryptic.decode(alice.sharedKey));
     bob.decrypted = await cryptic.decrypt(alice.encrypted, cryptic.decode(bob.sharedKey));
