@@ -172,37 +172,6 @@ function Cryptic(webCrypto, encoder, decoder) {
 
   };
 
-  const hkdf = cryptic.hkdf = async (bits, salt, info, size, hashAlg="SHA-256") => {
-    let ikm = bits;
-    let len = size;
-    let hashSize = 256;
-    if (hashAlg.toLocaleUpperCase() === 'SHA-512') {
-      hashSize = 512;
-    }
-    if (len > 255 * hashSize) {
-      throw("Error: Size exceeds maximum output length for selected hash.");
-    }
-    if (len < 8) {
-      throw("Error: Size cannot be smaller 8 bits.");
-    }
-    if (len / 8 !== parseInt(len / 8)) {
-      throw("Error: Size must be a multiple of 8 bits.");
-    }
-
-    let PRK = await hmacSign(salt, toText(ikm), hashAlg);
-    let result = new Uint8Array([]);
-    let T = new Uint8Array([]);
-    let rounds = Math.ceil(size / hashSize);
-    for (let i = 0; i < rounds; i++) {
-      let num = toText(new Uint8Array([i + 1]));
-      let t = toText(T) + toText(info);
-      let msg = t + num;
-      T = decode(await hmacSign(decode(PRK), msg, hashAlg));
-      result = combine(result, T);
-    }
-    return await encode(result.slice(0, len / 8));
-  };
-
   const kdf = cryptic.kdf = async (bits, salt, info, size, hashAlh="SHA-256") => {
     let key = await cryptic.hmacSign(bits, cryptic.toText(info));
     let hash = await cryptic.pbkdf2(cryptic.decode(key), salt, 1, size);
