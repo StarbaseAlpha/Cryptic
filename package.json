@@ -1,6 +1,6 @@
 {
   "name": "@starbase/cryptic",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Starbase Cryptography",
   "main": "index.js",
   "browser": "cryptic.min.js",
