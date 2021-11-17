@@ -1,6 +1,6 @@
 {
   "name": "@starbase/cryptic",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "Starbase Cryptography",
   "main": "index.js",
   "browser": "cryptic.min.js",
@@ -28,7 +28,6 @@
     "base64url"
   ],
   "dependencies": {
-    "node-webcrypto-ossl": "latest"
   },
   "author": "Mike Fuller",
   "license": "MIT",
