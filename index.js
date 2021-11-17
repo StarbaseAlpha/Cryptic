@@ -1,7 +1,6 @@
 'use strict';
 
-const WebCrypto = require("node-webcrypto-ossl");
-const webcrypto = new WebCrypto();
+const webcrypto = require('crypto').webcrypto;
 
 const encoder = require('util').TextEncoder;
 const decoder = require('util').TextDecoder;
