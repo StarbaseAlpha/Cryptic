@@ -2,8 +2,6 @@
 
 function Cryptic(webCrypto, encoder, decoder) {
 
-  let cryptic = {};
-
   let crypto = webCrypto;
   if (typeof window !== 'undefined') {
     crypto = window.crypto || webCrypto;
@@ -16,40 +14,40 @@ function Cryptic(webCrypto, encoder, decoder) {
     TextDecoder = window.TextDecoder;
   }
 
-  const toHex = cryptic.toHex = (byteArray) => {
+  const toHex = (byteArray) => {
     return Array.from(new Uint8Array(byteArray)).map(val => {
       return ('0' + val.toString(16)).slice(-2);
     }).join('');
   };
 
-  const fromHex = cryptic.fromHex = (str) => {
+  const fromHex = (str) => {
     let result = new Uint8Array(str.match(/.{0,2}/g).map(val => {
       return parseInt(val, 16);
     }));
     return result.slice(0, result.length - 1);
   };
 
-  const encode = cryptic.encode = (byteArray) => {
+  const encode = (byteArray) => {
     return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
       return String.fromCharCode(val);
     }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
   };
 
-  const decode = cryptic.decode = (str) => {
+  const decode = (str) => {
     return new Uint8Array(atob(str.replace(/\_/g, '/').replace(/\-/g, '+')).split('').map(val => {
       return val.charCodeAt(0);
     }));
   };
 
-  const fromText = cryptic.fromText = (string) => {
+  const fromText = (string) => {
     return new TextEncoder().encode(string);
   };
 
-  const toText = cryptic.toText = (byteArray) => {
+  const toText = (byteArray) => {
     return new TextDecoder().decode(byteArray);
   };
 
-  const combine = cryptic.combine = (bitsA = [], bitsB = []) => {
+  const combine = (bitsA = [], bitsB = []) => {
     let A = bitsA;
     let B = bitsB;
     if (typeof bitsA === 'string') {
@@ -66,37 +64,37 @@ function Cryptic(webCrypto, encoder, decoder) {
     return c;
   };
 
-  const random = cryptic.random = (size) => {
+  const random = (size) => {
     return crypto.getRandomValues(new Uint8Array(size));
   };
 
-  const createECDH = cryptic.createECDH = async (curve = "P-256") => {
+  const createECDH = async (curve = "P-256") => {
     let DH = await crypto.subtle.generateKey({
       "name": "ECDH",
       "namedCurve": curve
     }, true, ['deriveBits']);
     let pub = await crypto.subtle.exportKey('spki', DH.publicKey);
-    let key = encode(await crypto.subtle.exportKey('pkcs8', DH.privateKey));
+    let key = await crypto.subtle.exportKey('pkcs8', DH.privateKey);
     return {
       "pub": encode(pub),
-      "key": key
+      "key": encode(key)
     };
   };
 
-  const createECDSA = cryptic.createECDSA = async (curve = "P-256") => {
+  const createECDSA = async (curve = "P-256") => {
     let user = await crypto.subtle.generateKey({
       "name": "ECDSA",
       "namedCurve": curve
     }, true, ['sign', 'verify']);
     let pub = await crypto.subtle.exportKey('spki', user.publicKey);
-    let key = encode(await crypto.subtle.exportKey('pkcs8', user.privateKey));
+    let key = await crypto.subtle.exportKey('pkcs8', user.privateKey);
     return {
       "pub": encode(pub),
-      "key": key
+      "key": encode(key)
     };
   };
 
-  const ecdsaSign = cryptic.ecdsaSign = cryptic.sign = async (key, msg, curve = "P-256", hashAlg = "SHA-256") => {
+  const ecdsaSign = async (key, msg, curve = "P-256", hashAlg = "SHA-256") => {
     let message = msg.toString();
     let signKey = await crypto.subtle.importKey('pkcs8', decode(key), {
       "name": "ECDSA",
@@ -109,7 +107,7 @@ function Cryptic(webCrypto, encoder, decoder) {
     return encode(sig);
   };
 
-  const ecdsaVerify = cryptic.ecdsaVerify = cryptic.verify = async (pub, sig, msg, curve = "P-256", hashAlg = "SHA-256") => {
+  const ecdsaVerify = async (pub, sig, msg, curve = "P-256", hashAlg = "SHA-256") => {
     let message = msg.toString();
     let verifyKey = await crypto.subtle.importKey('spki', decode(pub), {
       "name": "ECDSA",
@@ -122,7 +120,7 @@ function Cryptic(webCrypto, encoder, decoder) {
     return verified;
   };
 
-  const hmacSign = cryptic.hmacSign = async (bits, msg, hashAlg="SHA-256") => {
+  const hmacSign = async (bits, msg, hashAlg="SHA-256") => {
     let message = msg.toString();
     let hmacKey = await crypto.subtle.importKey('raw', bits, {
       "name": "HMAC",
@@ -135,7 +133,7 @@ function Cryptic(webCrypto, encoder, decoder) {
     return encode(sig);
   };
 
-  const hmacVerify = cryptic.hmacVerify = async (bits, sig, msg, hashAlg="SHA-256") => {
+  const hmacVerify = async (bits, sig, msg, hashAlg="SHA-256") => {
     let message = msg.toString();
     let verifyKey = await crypto.subtle.importKey('raw', bits, {
       "name": "HMAC",
@@ -148,14 +146,14 @@ function Cryptic(webCrypto, encoder, decoder) {
     return verified;
   };
 
-  const digest = cryptic.digest = async (bits, hashAlg = "SHA-256") => {
-    let digest = await crypto.subtle.digest({
+  const digest = async (bits, hashAlg = "SHA-256") => {
+    let result = await crypto.subtle.digest({
       "name": hashAlg
     }, bits);
-    return toHex(digest);
+    return toHex(result);
   };
 
-  const pbkdf2 = cryptic.pbkdf2 = async (bits, salt, iterations = 1, size = 256, hashAlg = "SHA-256") => {
+  const pbkdf2 = async (bits, salt, iterations = 1, size = 256, hashAlg = "SHA-256") => {
 
     let key = await crypto.subtle.importKey('raw', bits, {
       "name": "PBKDF2"
@@ -172,13 +170,13 @@ function Cryptic(webCrypto, encoder, decoder) {
 
   };
 
-  const kdf = cryptic.kdf = async (bits, salt, info, size, hashAlg="SHA-256") => {
-    let key = await cryptic.hmacSign(bits, cryptic.toText(info));
-    let hash = await cryptic.pbkdf2(cryptic.decode(key), salt, 1, size, hashAlg);
+  const kdf = async (bits, salt, info, size, hashAlg="SHA-256") => {
+    let key = await hmacSign(bits, toText(info));
+    let hash = await pbkdf2(decode(key), salt, 1, size, hashAlg);
     return hash;
   };
 
-  const ecdh = cryptic.ecdh = async (key, pub, curve = "P-256", size = 256) => {
+  const ecdh = async (key, pub, curve = "P-256", size = 256) => {
 
     let pubKey = await crypto.subtle.importKey('spki', decode(pub), {
       "name": "ECDH",
@@ -201,7 +199,7 @@ function Cryptic(webCrypto, encoder, decoder) {
 
   };
 
-  const encrypt = cryptic.encrypt = async (plaintext, bits, AD = null) => {
+  const encrypt = async (plaintext, bits, AD = null) => {
     let key = await crypto.subtle.importKey('raw', bits, {
       "name": "AES-GCM"
     }, false, ['encrypt']);
@@ -215,7 +213,7 @@ function Cryptic(webCrypto, encoder, decoder) {
     return encode(iv) + '.' + encode(cipher);
   };
 
-  const decrypt = cryptic.decrypt = async (ciphertext = "", bits, AD = null) => {
+  const decrypt = async (ciphertext = "", bits, AD = null) => {
     let key = await crypto.subtle.importKey('raw', bits, {
       "name": "AES-GCM"
     }, false, ['decrypt']);
@@ -231,14 +229,14 @@ function Cryptic(webCrypto, encoder, decoder) {
     return toText(decrypted);
   };
 
-  const passwordEncrypt = cryptic.passwordEncrypt = async (message, password = "", iterations = 100000) => {
+  const passwordEncrypt = async (message, password = "", iterations = 100000) => {
     let salt = random(32);
     let keyBits = await pbkdf2(fromText(password), salt, iterations, 256);
     let encrypted = await encrypt(message, decode(keyBits));
     return encode(fromText(iterations.toString())) + '.' + encode(salt) + '.' + encrypted;
   };
 
-  const passwordDecrypt = cryptic.passwordDecrypt = async (ciphertext = "", password = "") => {
+  const passwordDecrypt = async (ciphertext = "", password = "") => {
     let iterations = toText(decode(ciphertext.split('.')[0]));
     let salt = ciphertext.split('.')[1];
     let keyBits = await pbkdf2(fromText(password), decode(salt), iterations, 256);
@@ -247,7 +245,7 @@ function Cryptic(webCrypto, encoder, decoder) {
     return decrypted;
   };
 
-  return cryptic;
+  return {combine, createECDH, createECDSA, decode, encode, decrypt, digest, ecdh, ecdsaSign, ecdsaVerify, encode, encrypt, fromHex, fromText, hmacSign, hmacVerify, kdf, passwordDecrypt, passwordEncrypt, pbkdf2, random, "sign":ecdsaSign, toHex, toText, "verify":ecdsaVerify};
 
 }
 
